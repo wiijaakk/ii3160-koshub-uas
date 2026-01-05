@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api-acc/:path*",
+      "destination": "http://18223088.tesatepadang.space/:path*"
+    },
+    {
+      "source": "/api-living/:path*",
+      "destination": "http://18223054.tesatepadang.space/:path*"
+    }
+  ]
+}
