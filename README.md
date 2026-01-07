@@ -37,15 +37,13 @@ KosHub adalah platform web komprehensif yang mengintegrasikan dua microservices:
 - UI modern dengan palet warna pink/merah kustom
 - Cepat dan dioptimalkan dengan Next.js 16
 
-## Stack Teknologi
+## Tech Stack
 
 ### Frontend
 - **Framework**: Next.js 16 (App Router)
 - **Bahasa**: TypeScript
 - **Styling**: Tailwind CSS 4
 - **HTTP Client**: Axios
-- **Icons**: Lucide React
-- **Penanganan Tanggal**: date-fns
 
 ### Backend Services
 - **Accommodation Service**: Express.js + PostgreSQL (Supabase)
