@@ -37,18 +37,6 @@ KosHub adalah platform web komprehensif yang mengintegrasikan dua microservices:
 - UI modern dengan palet warna pink/merah kustom
 - Cepat dan dioptimalkan dengan Next.js 16
 
-### Mengapa DDD?
-
-Sistem ini memiliki domain bisnis yang berbeda dengan karakteristik yang berbeda:
-1. **Pemesanan Akomodasi** - Berfokus pada ketersediaan kamar, harga, dan reservasi
-2. **Layanan Pendukung Kehidupan** - Berfokus pada pengiriman layanan harian dan manajemen pesanan
-
-Setiap domain memiliki:
-- Logika dan aturan bisnis sendiri
-- Model data sendiri
-- Manajemen lifecycle sendiri
-- Skalabilitas independen
-
 ## Stack Teknologi
 
 ### Frontend
