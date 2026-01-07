@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Shirt, UtensilsCrossed, ArrowRight } from 'lucide-react';
+import { Shirt, UtensilsCrossed, ArrowRight, Clock, Truck, CreditCard } from 'lucide-react';
 import { useAuth } from '../lib/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -20,136 +20,122 @@ export default function ServicesPage() {
     return null;
   }
 
+  const services = [
+    {
+      href: '/services/laundry',
+      icon: Shirt,
+      title: 'Laundry Service',
+      desc: 'Cuci, setrika, atau dry clean. Kami pickup dan antar langsung ke pintu kamu.',
+      prices: [
+        { label: 'Cuci', price: 'Rp 5.000/kg' },
+        { label: 'Cuci + Setrika', price: 'Rp 7.000/kg' },
+        { label: 'Dry Clean', price: 'Rp 15.000/kg' },
+        { label: 'Setrika', price: 'Rp 3.000/kg' },
+      ],
+      cta: 'Pesan Laundry',
+    },
+    {
+      href: '/services/catering',
+      icon: UtensilsCrossed,
+      title: 'Catering Service',
+      desc: 'Makanan Indonesia segar setiap hari. Breakfast, lunch, dinner, sampai snack!',
+      prices: [
+        { label: 'Breakfast', price: 'dari Rp 10.000' },
+        { label: 'Lunch/Dinner', price: 'dari Rp 15.000' },
+        { label: 'Snack', price: 'dari Rp 8.000' },
+      ],
+      cta: 'Lihat Menu',
+    },
+  ];
+
+  const steps = [
+    {
+      icon: CreditCard,
+      title: 'Pesan',
+      desc: 'Pilih layanan dan isi detail pesanan',
+    },
+    {
+      icon: Clock,
+      title: 'Proses',
+      desc: 'Tracking status real-time di dashboard',
+    },
+    {
+      icon: Truck,
+      title: 'Selesai',
+      desc: 'Pesanan diantar ke pintu kamu',
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-linear-to-b from-primary-50 to-white py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+    <div className="min-h-screen bg-gray-50 pt-16">
+      <div className="bg-primary-900 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">
             Living Support Services
           </h1>
-          <p className="text-xl text-gray-600">
-            Everything you need for comfortable kos living
+          <p className="text-primary-200 text-lg">
+            Semua kebutuhan hidup di kos dalam satu platform
           </p>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-          {/* Laundry Service Card */}
-          <Link
-            href="/services/laundry"
-            className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all border-2 border-transparent hover:border-primary-300"
-          >
-            <div className="w-20 h-20 bg-linear-to-br from-primary-500 to-primary-700 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-              <Shirt className="text-white" size={40} />
-            </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Laundry Service</h2>
-            <p className="text-gray-600 mb-6 text-lg">
-              Professional laundry services with multiple options. We pick up, clean, and deliver
-              your clothes right to your door.
-            </p>
-            <div className="space-y-2 mb-6">
-              <div className="flex items-center text-gray-700">
-                <span className="w-2 h-2 bg-primary-600 rounded-full mr-3"></span>
-                <span>Wash Only - Rp 5,000/kg</span>
-              </div>
-              <div className="flex items-center text-gray-700">
-                <span className="w-2 h-2 bg-primary-600 rounded-full mr-3"></span>
-                <span>Wash + Iron - Rp 7,000/kg</span>
-              </div>
-              <div className="flex items-center text-gray-700">
-                <span className="w-2 h-2 bg-primary-600 rounded-full mr-3"></span>
-                <span>Dry Clean - Rp 15,000/kg</span>
-              </div>
-              <div className="flex items-center text-gray-700">
-                <span className="w-2 h-2 bg-primary-600 rounded-full mr-3"></span>
-                <span>Iron Only - Rp 3,000/kg</span>
-              </div>
-            </div>
-            <div className="flex items-center text-primary-600 font-semibold group-hover:gap-3 gap-2 transition-all">
-              <span>Order Laundry Service</span>
-              <ArrowRight size={20} />
-            </div>
-          </Link>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+          {services.map((service) => (
+            <Link key={service.href} href={service.href} className="group">
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 h-full card-hover">
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="w-14 h-14 bg-primary-100 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-primary-600 transition-colors">
+                    <service.icon className="text-primary-600 group-hover:text-white transition-colors" size={28} />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900 mb-1">{service.title}</h2>
+                    <p className="text-gray-600 text-sm">{service.desc}</p>
+                  </div>
+                </div>
 
-          {/* Catering Service Card */}
-          <Link
-            href="/services/catering"
-            className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all border-2 border-transparent hover:border-primary-300"
-          >
-            <div className="w-20 h-20 bg-linear-to-br from-primary-500 to-primary-700 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-              <UtensilsCrossed className="text-white" size={40} />
-            </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Catering Service</h2>
-            <p className="text-gray-600 mb-6 text-lg">
-              Delicious Indonesian meals delivered fresh to your kos. Order breakfast, lunch,
-              dinner, or snacks with ease.
-            </p>
-            <div className="space-y-2 mb-6">
-              <div className="flex items-center text-gray-700">
-                <span className="w-2 h-2 bg-primary-600 rounded-full mr-3"></span>
-                <span>Breakfast - from Rp 10,000</span>
+                <div className="space-y-2 mb-6">
+                  {service.prices.map((price) => (
+                    <div key={price.label} className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">{price.label}</span>
+                      <span className="font-medium text-gray-900">{price.price}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex items-center text-primary-600 font-semibold group-hover:gap-2 transition-all">
+                  <span>{service.cta}</span>
+                  <ArrowRight size={18} />
+                </div>
               </div>
-              <div className="flex items-center text-gray-700">
-                <span className="w-2 h-2 bg-primary-600 rounded-full mr-3"></span>
-                <span>Lunch & Dinner - from Rp 15,000</span>
-              </div>
-              <div className="flex items-center text-gray-700">
-                <span className="w-2 h-2 bg-primary-600 rounded-full mr-3"></span>
-                <span>Snacks - from Rp 8,000</span>
-              </div>
-              <div className="flex items-center text-gray-700">
-                <span className="w-2 h-2 bg-primary-600 rounded-full mr-3"></span>
-                <span>Custom delivery schedule</span>
-              </div>
-            </div>
-            <div className="flex items-center text-primary-600 font-semibold group-hover:gap-3 gap-2 transition-all">
-              <span>Browse Menu & Order</span>
-              <ArrowRight size={20} />
-            </div>
-          </Link>
+            </Link>
+          ))}
         </div>
 
-        {/* Information Section */}
-        <div className="mt-16 bg-white rounded-2xl p-8 shadow-lg max-w-5xl mx-auto">
-          <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">How It Works</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-primary-600 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
-                1
+        <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+          <h3 className="text-xl font-bold text-gray-900 mb-8 text-center">Cara Kerja</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {steps.map((step, i) => (
+              <div key={step.title} className="text-center">
+                <div className="w-14 h-14 bg-primary-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <step.icon className="text-white" size={24} />
+                </div>
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <span className="w-6 h-6 bg-primary-100 text-primary-600 rounded-full text-sm font-bold flex items-center justify-center">
+                    {i + 1}
+                  </span>
+                  <h4 className="font-semibold text-gray-900">{step.title}</h4>
+                </div>
+                <p className="text-gray-600 text-sm">{step.desc}</p>
               </div>
-              <h4 className="font-semibold text-gray-900 mb-2">Place Your Order</h4>
-              <p className="text-gray-600 text-sm">
-                Select your service, choose your preferences, and schedule pickup or delivery
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-primary-600 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
-                2
-              </div>
-              <h4 className="font-semibold text-gray-900 mb-2">Track Your Order</h4>
-              <p className="text-gray-600 text-sm">
-                Receive real-time notifications and track your order status in the dashboard
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-primary-600 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
-                3
-              </div>
-              <h4 className="font-semibold text-gray-900 mb-2">Enjoy Your Service</h4>
-              <p className="text-gray-600 text-sm">
-                Receive your clean laundry or fresh meal right at your door
-              </p>
-            </div>
+            ))}
           </div>
         </div>
 
-        {/* Note */}
-        <div className="mt-8 max-w-5xl mx-auto">
-          <div className="bg-primary-50 border-l-4 border-primary-600 p-4 rounded">
-            <p className="text-primary-900">
-              <span className="font-semibold">Note:</span> You must have an active accommodation
-              booking to use these services. Book your kos first if you haven't already!
-            </p>
-          </div>
+        <div className="mt-8 bg-primary-50 border border-primary-200 rounded-xl p-4">
+          <p className="text-primary-800 text-sm">
+            <span className="font-semibold">Note:</span> Kamu harus punya booking kos aktif untuk menggunakan layanan ini.
+          </p>
         </div>
       </div>
     </div>

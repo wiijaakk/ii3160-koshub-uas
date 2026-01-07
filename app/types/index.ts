@@ -132,7 +132,6 @@ export interface CreateCateringData {
   special_requests?: string;
 }
 
-// Notification Types
 export interface Notification {
   id: number;
   user_id: string;

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../lib/AuthContext';
 import { laundryApi, bookingApi } from '../../lib/api';
-import { Shirt, Calendar, Clock, Package, ArrowLeft } from 'lucide-react';
+import { Shirt, Calendar, Clock, ArrowLeft, Check } from 'lucide-react';
 import Link from 'next/link';
 import type { CreateLaundryData, Booking } from '../../types';
 import { LAUNDRY_PRICES, LAUNDRY_SERVICE_NAMES } from '../../types';
@@ -35,15 +35,12 @@ export default function LaundryPage() {
 
   const fetchBookings = async () => {
     try {
-      console.log('Fetching bookings for user:', user);
       const data = await bookingApi.getById(user?.id!);
-      console.log('Ini loh datanya', data);
       const dataArray = Array.isArray(data) ? data : [data];
       const successBookings = dataArray.filter((b: Booking) => b.status === 'SUCCESS');
       setBookings(successBookings);
       if (successBookings.length > 0) {
         setSelectedBooking(successBookings[0].booking_id);
-        console.log('Selected booking set to:', successBookings[0].booking_id);
       }
     } catch (err) {
       console.error('Failed to fetch bookings:', err);
@@ -57,7 +54,7 @@ export default function LaundryPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedBooking) {
-      setError('Please select a booking');
+      setError('Pilih booking terlebih dahulu');
       return;
     }
 
@@ -70,7 +67,7 @@ export default function LaundryPage() {
         ...formData,
         booking_id: selectedBooking,
       });
-      setSuccess('Laundry order placed successfully!');
+      setSuccess('Pesanan laundry berhasil dibuat!');
       setFormData({
         service_type: 'wash',
         weight: 1,
@@ -82,7 +79,7 @@ export default function LaundryPage() {
         router.push('/dashboard');
       }, 2000);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to place order');
+      setError(err.response?.data?.error || 'Gagal membuat pesanan');
     } finally {
       setLoading(false);
     }
@@ -94,26 +91,26 @@ export default function LaundryPage() {
 
   if (bookings.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-primary-50 to-white py-12">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 pt-20">
+        <div className="max-w-lg mx-auto px-4 py-12">
           <Link
             href="/services"
-            className="inline-flex items-center text-primary-600 hover:text-primary-700 mb-6"
+            className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6"
           >
-            <ArrowLeft size={20} className="mr-2" />
-            Back to Services
+            <ArrowLeft size={18} className="mr-2" />
+            Kembali
           </Link>
-          <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
-            <Shirt className="mx-auto text-gray-400 mb-4" size={64} />
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">No Active Bookings</h2>
+          <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-center">
+            <Shirt className="mx-auto text-gray-300 mb-4" size={48} />
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Belum Ada Booking Aktif</h2>
             <p className="text-gray-600 mb-6">
-              You need an active accommodation booking to use laundry services.
+              Kamu perlu booking kos terlebih dahulu untuk menggunakan layanan laundry.
             </p>
             <Link
               href="/accommodations"
-              className="inline-block bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition"
+              className="inline-block bg-primary-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-primary-700 transition-colors"
             >
-              Browse Accommodations
+              Cari Kos
             </Link>
           </div>
         </div>
@@ -122,169 +119,162 @@ export default function LaundryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary-50 to-white py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 pt-20">
+      <div className="max-w-2xl mx-auto px-4 py-8">
         <Link
           href="/services"
-          className="inline-flex items-center text-primary-600 hover:text-primary-700 mb-6"
+          className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6"
         >
-          <ArrowLeft size={20} className="mr-2" />
-          Back to Services
+          <ArrowLeft size={18} className="mr-2" />
+          Kembali
         </Link>
 
-        <div className="bg-white rounded-2xl p-8 shadow-lg">
-          <div className="flex items-center mb-6">
-            <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-700 rounded-full flex items-center justify-center mr-4">
-              <Shirt className="text-white" size={32} />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Laundry Service</h1>
-              <p className="text-gray-600">Professional laundry at your doorstep</p>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="bg-primary-900 p-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
+                <Shirt className="text-white" size={24} />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-white">Laundry Service</h1>
+                <p className="text-primary-200 text-sm">Professional laundry di pintu kamu</p>
+              </div>
             </div>
           </div>
 
-          {error && (
-            <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-              {error}
-            </div>
-          )}
+          <div className="p-6">
+            {error && (
+              <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+                {error}
+              </div>
+            )}
 
-          {success && (
-            <div className="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
-              {success}
-            </div>
-          )}
+            {success && (
+              <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
+                <Check size={18} />
+                {success}
+              </div>
+            )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Select Booking
-              </label>
-              <select
-                value={selectedBooking || ''}
-                onChange={(e) => setSelectedBooking(Number(e.target.value))}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                required
-              >
-                {bookings.map((booking) => (
-                  <option key={booking.booking_id} value={booking.booking_id}>
-                    Booking #{booking.booking_id} - Accommodation ID: {booking.accommodation_id}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Pilih Booking
+                </label>
+                <select
+                  value={selectedBooking || ''}
+                  onChange={(e) => setSelectedBooking(Number(e.target.value))}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  required
+                >
+                  {bookings.map((booking) => (
+                    <option key={booking.booking_id} value={booking.booking_id}>
+                      Booking #{booking.booking_id} - Kos ID: {booking.accommodation_id}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Service Type
-              </label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Object.entries(LAUNDRY_SERVICE_NAMES).map(([key, name]) => (
-                  <label
-                    key={key}
-                    className={`cursor-pointer border-2 rounded-lg p-4 transition ${
-                      formData.service_type === key
-                        ? 'border-primary-600 bg-primary-50'
-                        : 'border-gray-200 hover:border-primary-300'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="service_type"
-                      value={key}
-                      checked={formData.service_type === key}
-                      onChange={(e) =>
-                        setFormData({ ...formData, service_type: e.target.value as any })
-                      }
-                      className="sr-only"
-                    />
-                    <div className="flex justify-between items-center">
-                      <span className="font-medium text-gray-900">{name}</span>
-                      <span className="text-primary-600 font-semibold">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Jenis Layanan
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  {Object.entries(LAUNDRY_SERVICE_NAMES).map(([key, name]) => (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, service_type: key as any })}
+                      className={`p-4 rounded-xl border-2 text-left transition-all ${formData.service_type === key
+                          ? 'border-primary-600 bg-primary-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                    >
+                      <p className="font-medium text-gray-900">{name}</p>
+                      <p className="text-sm text-primary-600 font-semibold">
                         Rp {LAUNDRY_PRICES[key as keyof typeof LAUNDRY_PRICES].toLocaleString()}/kg
-                      </span>
-                    </div>
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Berat (kg)
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  step="0.5"
+                  value={formData.weight}
+                  onChange={(e) => setFormData({ ...formData, weight: Number(e.target.value) })}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <Calendar className="inline mr-1" size={14} />
+                    Tanggal Pickup
                   </label>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Weight (kg)
-              </label>
-              <input
-                type="number"
-                min="1"
-                step="0.5"
-                value={formData.weight}
-                onChange={(e) => setFormData({ ...formData, weight: Number(e.target.value) })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <Calendar className="inline mr-2" size={16} />
-                  Pickup Date
-                </label>
-                <input
-                  type="date"
-                  value={formData.pickup_date}
-                  onChange={(e) => setFormData({ ...formData, pickup_date: e.target.value })}
-                  min={new Date().toISOString().split('T')[0]}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  required
-                />
+                  <input
+                    type="date"
+                    value={formData.pickup_date}
+                    onChange={(e) => setFormData({ ...formData, pickup_date: e.target.value })}
+                    min={new Date().toISOString().split('T')[0]}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <Clock className="inline mr-1" size={14} />
+                    Waktu Pickup
+                  </label>
+                  <input
+                    type="time"
+                    value={formData.pickup_time}
+                    onChange={(e) => setFormData({ ...formData, pickup_time: e.target.value })}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    required
+                  />
+                </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <Clock className="inline mr-2" size={16} />
-                  Pickup Time
+                  Catatan (Opsional)
                 </label>
-                <input
-                  type="time"
-                  value={formData.pickup_time}
-                  onChange={(e) => setFormData({ ...formData, pickup_time: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  required
+                <textarea
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  rows={2}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Instruksi khusus..."
                 />
               </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Special Notes (Optional)
-              </label>
-              <textarea
-                value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                rows={3}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Any special instructions..."
-              />
-            </div>
-
-            <div className="bg-primary-50 border-l-4 border-primary-600 p-4 rounded">
-              <div className="flex justify-between items-center">
-                <span className="text-lg font-medium text-gray-900">Total Price:</span>
-                <span className="text-2xl font-bold text-primary-600">
-                  Rp {calculatePrice().toLocaleString()}
-                </span>
+              <div className="bg-primary-50 rounded-xl p-4">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium text-gray-900">Total Harga</span>
+                  <span className="text-2xl font-bold text-primary-600">
+                    Rp {calculatePrice().toLocaleString()}
+                  </span>
+                </div>
               </div>
-            </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-primary-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-primary-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Placing Order...' : 'Place Laundry Order'}
-            </button>
-          </form>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold hover:bg-primary-700 transition-colors disabled:bg-gray-300 btn-press"
+              >
+                {loading ? 'Memproses...' : 'Pesan Laundry'}
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </div>

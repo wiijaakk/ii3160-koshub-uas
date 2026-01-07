@@ -16,11 +16,9 @@ import type {
 } from '../types';
 import { UUID } from 'crypto';
 
-// API Base URLs
 const ACCOMMODATION_API = process.env.NEXT_PUBLIC_ACCOMMODATION_API || 'http://localhost:3000';
 const LIVING_SUPPORT_API = process.env.NEXT_PUBLIC_LIVING_SUPPORT_API || 'http://localhost:3010';
 
-// Create axios instances
 const accommodationAxios = axios.create({
   baseURL: ACCOMMODATION_API,
   headers: {
@@ -35,7 +33,6 @@ const livingSupportAxios = axios.create({
   },
 });
 
-// Request interceptors to add auth token
 const addAuthInterceptor = (apiInstance: any) => {
   apiInstance.interceptors.request.use(
     (config: any) => {
@@ -52,8 +49,7 @@ const addAuthInterceptor = (apiInstance: any) => {
     }
   );
 
-  // Response interceptor for error handling
-  apiInstance.interceptors.response.use(
+apiInstance.interceptors.response.use(
     (response: any) => {
       console.log('API Response:', response.status, response.config.url, response.data);
       return response;
@@ -74,11 +70,9 @@ const addAuthInterceptor = (apiInstance: any) => {
 addAuthInterceptor(accommodationAxios);
 addAuthInterceptor(livingSupportAxios);
 
-// ============= Authentication API =============
 export const authApi = {
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
     const { data } = await accommodationAxios.post('/auth/login', credentials);
-    // Transform backend response to expected format
     if (data.session && data.session.access_token) {
       return {
         access_token: data.session.access_token,
@@ -91,7 +85,6 @@ export const authApi = {
 
   register: async (registerData: RegisterData): Promise<AuthResponse> => {
     const { data } = await accommodationAxios.post('/auth/register', registerData);
-    // Transform backend response to expected format
     if (data.session && data.session.access_token) {
       return {
         access_token: data.session.access_token,
@@ -110,7 +103,6 @@ export const authApi = {
   },
 };
 
-// ============= User API =============
 export const userApi = {
   getById: async (userId: UUID): Promise<User> => {
     const { data } = await accommodationAxios.get(`/users/${userId}`);
@@ -118,7 +110,6 @@ export const userApi = {
   },
 };
 
-// ============= Accommodation API =============
 export const accommodationApi = {
   getAll: async (): Promise<Accommodation[]> => {
     const { data } = await accommodationAxios.get('/accommodations');
@@ -185,7 +176,6 @@ export const bookingApi = {
   },
 };
 
-// ============= Laundry Service API =============
 export const laundryApi = {
   getAll: async (): Promise<LaundryService[]> => {
     const { data } = await livingSupportAxios.get('/api/laundry');
@@ -233,13 +223,11 @@ export const laundryApi = {
   },
 };
 
-// ============= Catering Service API =============
 export const cateringApi = {
   getMenu: async (): Promise<CateringMenu> => {
     console.log('Fetching menu from:', LIVING_SUPPORT_API + '/api/catering/menu');
     const { data } = await livingSupportAxios.get('/api/catering/menu');
     console.log('Raw menu response:', data);
-    // If backend returns { menu: {...} }, extract it
     const menu = data.menu || data;
     console.log('Extracted menu:', menu);
     return menu;
