@@ -37,31 +37,40 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const results = await Promise.allSettled([
-        authApi.register({
-          email: formData.email,
-          password: formData.password,
-          name: formData.name,
-          membership_level: formData.membership_level,
-        }),
-        authApiOdy.register({
-          email: formData.email,
-          password: formData.password,
-          name: formData.name,
-          membership_level: formData.membership_level,
-        }),
-      ]);
-
-      const allFailed = results.every(r => r.status === 'rejected');
-      if (allFailed) {
-        const firstError = results[0] as PromiseRejectedResult;
-        throw firstError.reason;
+      await authApi.register({
+        email: formData.email,
+        password: formData.password,
+        name: formData.name,
+        membership_level: formData.membership_level,
+      });
+    } catch (err: any) {
+      if (!err.response?.data?.message?.includes('already')) {
+        setError(err.response?.data?.message || 'Registrasi Accommodation gagal.');
+        setLoading(false);
+        return;
       }
+    }
 
+    try {
+      await authApiOdy.register({
+        email: formData.email,
+        password: formData.password,
+        name: formData.name,
+        membership_level: formData.membership_level,
+      });
+    } catch (err: any) {
+      if (!err.response?.data?.message?.includes('already')) {
+        setError(err.response?.data?.message || 'Registrasi Living Support gagal.');
+        setLoading(false);
+        return;
+      }
+    }
+
+    try {
       await login({ email: formData.email, password: formData.password });
       router.push('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Registrasi gagal. Coba lagi.');
+      setError(err.response?.data?.message || 'Login gagal setelah registrasi.');
     } finally {
       setLoading(false);
     }
