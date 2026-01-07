@@ -37,7 +37,7 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      await Promise.all([
+      const results = await Promise.allSettled([
         authApi.register({
           email: formData.email,
           password: formData.password,
@@ -51,6 +51,13 @@ export default function RegisterPage() {
           membership_level: formData.membership_level,
         }),
       ]);
+
+      const allFailed = results.every(r => r.status === 'rejected');
+      if (allFailed) {
+        const firstError = results[0] as PromiseRejectedResult;
+        throw firstError.reason;
+      }
+
       await login({ email: formData.email, password: formData.password });
       router.push('/dashboard');
     } catch (err: any) {
