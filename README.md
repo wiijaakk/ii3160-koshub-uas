@@ -2,7 +2,9 @@
 
 **Tugas 3 - Integrasi Layanan (II3160 UAS)**
 
-<img src="public/logosite.png" width="100" height="100"/>
+<div align="center">
+  <img src="public/logosite.png" width="300" height="300"/>
+</div>
 
 KosHub adalah platform web komprehensif yang mengintegrasikan dua microservices: **Pemesanan Akomodasi** dan **Layanan Pendukung Kehidupan**. Dibangun dengan teknologi web modern dan prinsip Domain-Driven Design (DDD), KosHub menyediakan pengalaman yang mulus bagi mahasiswa dan penghuni kos untuk menemukan akomodasi dan mengelola layanan kehidupan sehari-hari.
 
