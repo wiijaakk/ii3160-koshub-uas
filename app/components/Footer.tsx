@@ -10,10 +10,11 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="md:col-span-1">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center font-bold text-lg">
-                K
-              </div>
-              <span className="text-xl font-bold">KosHub</span>
+              <img
+                src="/image.png"
+                alt="KosHub Logo"
+                className="h-10 w-auto object-contain"
+              />
             </div>
             <p className="text-gray-400 text-sm leading-relaxed">
               Platform terintegrasi untuk booking kos dan layanan pendukung kehidupan sehari-hari.
