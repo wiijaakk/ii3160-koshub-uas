@@ -103,6 +103,13 @@ export const authApi = {
   },
 };
 
+export const authApiOdy = {
+  register: async (registerData: RegisterData): Promise<AuthResponse> => {
+    const { data } = await livingSupportAxios.post('/auth/register', registerData);
+    return data;
+  },
+};
+
 export const userApi = {
   getById: async (userId: UUID): Promise<User> => {
     const { data } = await accommodationAxios.get(`/users/${userId}`);

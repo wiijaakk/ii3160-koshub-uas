@@ -29,8 +29,8 @@ export default function Navbar() {
   };
 
   const navLinks = [
-    { href: '/', icon: Home, label: 'Home', public: true },
-    { href: '/accommodations', icon: Building2, label: 'Kos', public: true },
+    { href: '/', icon: Home, label: 'Home', public: false },
+    { href: '/accommodations', icon: Building2, label: 'Kos', public: false },
     { href: '/services', icon: ShoppingBag, label: 'Services', public: false },
     { href: '/dashboard', icon: User, label: 'Dashboard', public: false },
   ];

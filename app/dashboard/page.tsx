@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../lib/AuthContext';
-import { bookingApi, userApi } from '../lib/api';
-import type { Booking } from '../types';
-import { Building2, Calendar, CheckCircle, Clock, XCircle, Shirt, UtensilsCrossed, ArrowRight } from 'lucide-react';
+import { bookingApi, userApi, laundryApi, cateringApi } from '../lib/api';
+import type { Booking, LaundryService, CateringOrder } from '../types';
+import { Building2, Calendar, CheckCircle, Clock, XCircle, Shirt, UtensilsCrossed, ArrowRight, Package } from 'lucide-react';
 import { format } from 'date-fns';
 import Link from 'next/link';
 
@@ -13,6 +13,8 @@ export default function DashboardPage() {
   const { isAuthenticated, user } = useAuth();
   const router = useRouter();
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [laundryOrders, setLaundryOrders] = useState<LaundryService[]>([]);
+  const [cateringOrders, setCateringOrders] = useState<CateringOrder[]>([]);
   const [userName, setUserName] = useState<string>('');
   const [discountRate, setDiscountRate] = useState<number | undefined>(undefined);
   const [membershipLevel, setMembershipLevel] = useState<string>('');
@@ -25,6 +27,7 @@ export default function DashboardPage() {
     }
     fetchUserDetails();
     fetchBookings();
+    fetchLivingSupportOrders();
   }, [isAuthenticated, router]);
 
   const fetchUserDetails = async () => {
@@ -51,6 +54,19 @@ export default function DashboardPage() {
     }
   };
 
+  const fetchLivingSupportOrders = async () => {
+    try {
+      const [laundry, catering] = await Promise.all([
+        laundryApi.getAll().catch(() => []),
+        cateringApi.getAll().catch(() => []),
+      ]);
+      setLaundryOrders(Array.isArray(laundry) ? laundry : []);
+      setCateringOrders(Array.isArray(catering) ? catering : []);
+    } catch (error) {
+      console.error('Failed to fetch living support orders:', error);
+    }
+  };
+
   const handleUpdateBookingStatus = async (bookingId: number, status: 'SUCCESS' | 'CANCELLED', accommodationId: number) => {
     try {
       await bookingApi.updateStatus(bookingId, status, accommodationId);
@@ -63,33 +79,25 @@ export default function DashboardPage() {
   const getStatusConfig = (status: string) => {
     switch (status) {
       case 'SUCCESS':
-        return {
-          icon: <CheckCircle size={16} />,
-          bg: 'bg-green-100',
-          text: 'text-green-700',
-          label: 'Aktif'
-        };
+      case 'delivered':
+        return { icon: <CheckCircle size={14} />, bg: 'bg-green-100', text: 'text-green-700', label: 'Selesai' };
       case 'PENDING':
-        return {
-          icon: <Clock size={16} />,
-          bg: 'bg-yellow-100',
-          text: 'text-yellow-700',
-          label: 'Menunggu Bayar'
-        };
+      case 'pending':
+        return { icon: <Clock size={14} />, bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Pending' };
       case 'CANCELLED':
-        return {
-          icon: <XCircle size={16} />,
-          bg: 'bg-red-100',
-          text: 'text-red-700',
-          label: 'Dibatalkan'
-        };
+      case 'cancelled':
+        return { icon: <XCircle size={14} />, bg: 'bg-red-100', text: 'text-red-700', label: 'Dibatalkan' };
+      case 'picked_up':
+      case 'confirmed':
+        return { icon: <Package size={14} />, bg: 'bg-blue-100', text: 'text-blue-700', label: 'Diproses' };
+      case 'in_progress':
+      case 'preparing':
+        return { icon: <Clock size={14} />, bg: 'bg-orange-100', text: 'text-orange-700', label: 'Dalam Proses' };
+      case 'ready':
+      case 'on_delivery':
+        return { icon: <Package size={14} />, bg: 'bg-purple-100', text: 'text-purple-700', label: 'Siap Antar' };
       default:
-        return {
-          icon: null,
-          bg: 'bg-gray-100',
-          text: 'text-gray-700',
-          label: status
-        };
+        return { icon: null, bg: 'bg-gray-100', text: 'text-gray-700', label: status };
     }
   };
 
@@ -106,20 +114,23 @@ export default function DashboardPage() {
       iconColor: 'text-primary-600'
     },
     {
-      label: 'Aktif',
-      value: bookings.filter((b) => b.status === 'SUCCESS').length,
-      icon: <CheckCircle size={20} />,
-      bg: 'bg-green-100',
-      iconColor: 'text-green-600'
+      label: 'Laundry',
+      value: laundryOrders.filter(o => o.status !== 'delivered' && o.status !== 'cancelled').length,
+      icon: <Shirt size={20} />,
+      bg: 'bg-blue-100',
+      iconColor: 'text-blue-600'
     },
     {
-      label: 'Menunggu Bayar',
-      value: bookings.filter((b) => b.status === 'PENDING').length,
-      icon: <Clock size={20} />,
-      bg: 'bg-yellow-100',
-      iconColor: 'text-yellow-600'
+      label: 'Catering',
+      value: cateringOrders.filter(o => o.status !== 'delivered' && o.status !== 'cancelled').length,
+      icon: <UtensilsCrossed size={20} />,
+      bg: 'bg-orange-100',
+      iconColor: 'text-orange-600'
     },
   ];
+
+  const activeLaundry = laundryOrders.filter(o => o.status !== 'cancelled');
+  const activeCatering = cateringOrders.filter(o => o.status !== 'cancelled');
 
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
@@ -163,10 +174,10 @@ export default function DashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-6">
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
               <div className="p-5 border-b border-gray-100">
-                <h2 className="text-lg font-bold text-gray-900">Booking Kamu</h2>
+                <h2 className="text-lg font-bold text-gray-900">Booking Kos</h2>
               </div>
 
               {loading ? (
@@ -246,6 +257,72 @@ export default function DashboardPage() {
                               </button>
                             </div>
                           )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="p-5 border-b border-gray-100">
+                <h2 className="text-lg font-bold text-gray-900">Living Support Orders</h2>
+              </div>
+
+              {activeLaundry.length === 0 && activeCatering.length === 0 ? (
+                <div className="p-8 text-center">
+                  <Package className="mx-auto text-gray-300 mb-3" size={48} />
+                  <p className="text-gray-500 mb-4">Belum ada pesanan layanan</p>
+                  <Link
+                    href="/services"
+                    className="inline-flex items-center gap-2 text-primary-600 font-semibold hover:text-primary-700"
+                  >
+                    Lihat Layanan <ArrowRight size={16} />
+                  </Link>
+                </div>
+              ) : (
+                <div className="divide-y divide-gray-100">
+                  {activeLaundry.map((order) => {
+                    const statusConfig = getStatusConfig(order.status);
+                    return (
+                      <div key={`laundry-${order.id}`} className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <Shirt className="text-blue-600" size={20} />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between">
+                              <h4 className="font-medium text-gray-900">Laundry #{order.id}</h4>
+                              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${statusConfig.bg} ${statusConfig.text}`}>
+                                {statusConfig.icon}
+                                {statusConfig.label}
+                              </span>
+                            </div>
+                            <p className="text-sm text-gray-500">{order.weight}kg - Rp {order.total_price.toLocaleString()}</p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {activeCatering.map((order) => {
+                    const statusConfig = getStatusConfig(order.status);
+                    return (
+                      <div key={`catering-${order.id}`} className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                            <UtensilsCrossed className="text-orange-600" size={20} />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between">
+                              <h4 className="font-medium text-gray-900">Catering #{order.id}</h4>
+                              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${statusConfig.bg} ${statusConfig.text}`}>
+                                {statusConfig.icon}
+                                {statusConfig.label}
+                              </span>
+                            </div>
+                            <p className="text-sm text-gray-500">{order.menu_name} x{order.quantity} - Rp {order.total_price.toLocaleString()}</p>
+                          </div>
                         </div>
                       </div>
                     );

@@ -5,10 +5,11 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '../../lib/AuthContext';
 import { Mail, Lock, User, Crown, ArrowRight } from 'lucide-react';
+import { authApi, authApiOdy } from '../../lib/api';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { register } = useAuth();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -36,12 +37,21 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      await register({
-        email: formData.email,
-        password: formData.password,
-        name: formData.name,
-        membership_level: formData.membership_level,
-      });
+      await Promise.all([
+        authApi.register({
+          email: formData.email,
+          password: formData.password,
+          name: formData.name,
+          membership_level: formData.membership_level,
+        }),
+        authApiOdy.register({
+          email: formData.email,
+          password: formData.password,
+          name: formData.name,
+          membership_level: formData.membership_level,
+        }),
+      ]);
+      await login({ email: formData.email, password: formData.password });
       router.push('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Registrasi gagal. Coba lagi.');
